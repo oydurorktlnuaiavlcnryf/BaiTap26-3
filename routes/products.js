@@ -90,18 +90,17 @@ router.post('/', async function (req, res) {
             images: req.body.images
         })
         await newProduct.save({ session })
-        console.log(newProduct);
         let newInventory = new inventoryModel({
             product: newProduct._id,
             stock: -1
         })
         await newInventory.save({ session })
         await newInventory.populate('product')
-        session.commitTransaction();
+        await session.commitTransaction();
         session.endSession()
         res.send(newInventory)
     } catch (error) {
-        session.abortTransaction();
+        await session.abortTransaction();
         session.endSession()
         res.status(404).send(error.message)
     }
